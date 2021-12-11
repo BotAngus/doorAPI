@@ -1,4 +1,5 @@
 const express = require('express');
+const req = require('express/lib/request');
 const app = express();
 
 const PORT = 8080;
@@ -8,19 +9,36 @@ app.listen(
     () => console.log("It's alive")
 )
 
-var door = {
-    'state': 'open',
-    'length': 1,
-    'width': 1,
-    'color': "Red",
-    'creator': 'John Cena'
-}
 
+const newDoor = (maxHeight, maxWidth ) => ({
+    'state': Math.floor(Math.random * 2) < 1 ? 'open' : 'closed',
+    'height': Math.floor(Math.random() * maxHeight),
+    'width': Math.floor(Math.random() * maxWidth),
+    'colour': Math.floor(Math.random()*16777215).toString(16)
+})
+
+var door = newDoor(200, 200)
 app.use( express.json() )
+
+// app.get('/show', (req, res) => {
+//     console.log(door)
+//     res.status(200).send(
+//         `
+//         <div style="width:${door.width}px; height:${door.height}px; background-color:#${door.color};">
+//         </div>
+//         `
+//     )
+// })
 
 app.get('/state', (req, res) => {
     res.status(200).send({
         'state': door.state
+    })
+})
+
+app.get('/colour', (req, res) => {
+    res.status(200).send( {
+        'colour': '#' + door.colour
     })
 })
 
@@ -43,6 +61,14 @@ app.patch('/state/:move', (req, res) => {
             'response':`Door cannot be ${move}`
         })
     }
+})
+
+app.post('/steal', (req, res) => {
+    const { width, length } = req.body;
+    res.status(200).send({
+        'length': width,
+        'width': length
+    })
 })
 
 // The door is either open or closed
