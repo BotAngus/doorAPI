@@ -10,15 +10,15 @@ app.listen(
 )
 
 
-const newDoor = (maxHeight, maxWidth ) => ({
+const newDoor = (maxHeight, maxWidth) => ({
     'state': Math.floor(Math.random * 2) < 1 ? 'open' : 'closed',
     'height': Math.floor(Math.random() * maxHeight),
     'width': Math.floor(Math.random() * maxWidth),
-    'colour': Math.floor(Math.random()*16777215).toString(16)
+    'colour': Math.floor(Math.random() * 16777215).toString(16)
 })
 
 var door = newDoor(200, 200)
-app.use( express.json() )
+app.use(express.json())
 
 // app.get('/show', (req, res) => {
 //     console.log(door)
@@ -37,7 +37,7 @@ app.get('/state', (req, res) => {
 })
 
 app.get('/colour', (req, res) => {
-    res.status(200).send( {
+    res.status(200).send({
         'colour': '#' + door.colour
     })
 })
@@ -53,22 +53,27 @@ app.patch('/state/:move', (req, res) => {
         })
     } else if (move == door.state) {
         res.status(409).send({
-            'response':`Door is already ${move}`
+            'response': `Door is already ${move}`
         })
-    } 
+    }
     else {
         res.status(400).send({
-            'response':`Door cannot be ${move}`
+            'response': `Door cannot be ${move}`
         })
     }
 })
 
 app.post('/steal', (req, res) => {
     const { width, length } = req.body;
-    res.status(200).send({
-        'length': width,
-        'width': length
-    })
+    if (width == door.width && length == door.length) {
+        res.status(200).send(door)
+        door = newDoor(200, 200)
+    } else {
+        res.status(200).send({
+            'length': width,
+            'width': length
+        })
+    }
 })
 
 // The door is either open or closed
